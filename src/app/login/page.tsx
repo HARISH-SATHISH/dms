@@ -1,16 +1,17 @@
 "use client"
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation'
 
 const Login: React.FC = () => {
+  const router = useRouter()
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-
   const handleFarmerLogin = () => {
     // You can add your login logic here for farmer login
     if (username === 'farmer' && password === 'password') {
       // If login is successful, redirect or perform any other action
-      alert('Login successful as farmer!');
+      router.push('/farmer')
     } else {
       setError('Invalid username or password');
     }

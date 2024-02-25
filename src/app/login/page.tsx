@@ -1,62 +1,94 @@
 "use client"
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation'
+import { graphqlClient } from '../../../clients/api';
+import { verifyEmp, verifyFarmer } from '../../../graphql/query/user';
+import Backgroundimg from '../components/Backgroundimg';
 
 const Login: React.FC = () => {
   const router = useRouter()
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const handleFarmerLogin = () => {
-    // You can add your login logic here for farmer login
-    if (username === 'farmer' && password === 'password') {
-      // If login is successful, redirect or perform any other action
-      router.push('/farmer')
-    } else {
-      setError('Invalid username or password');
-    }
+  const [loged,setLoged]=useState(false)
+
+const creddata={
+  id:parseInt(username),
+  pass:password
+}
+
+  const handleFarmerLogin = async () => {
+  const farmer=await graphqlClient.request(verifyFarmer,{payload:creddata})
+  
+  if(farmer.verifyFarmer?.id){
+    setLoged(true)
+  
+    router.push('/farmer')
+  }
+
+  else{
+    alert("wrong credentials")
+  }
   };
 
-  const handleEmployeeLogin = () => {
-    // You can add your login logic here for employee login
-    if (username === 'employee' && password === 'password') {
-      // If login is successful, redirect or perform any other action
-      alert('Login successful as employee!');
-    } else {
-      setError('Invalid username or password');
-    }
+
+
+
+  const handleEmployeeLogin = async () => {
+    const farmer=await graphqlClient.request(verifyEmp,{payload:creddata})
+  
+  if(farmer.verifyEmp?.id){
+    setLoged(true)
+  
+    router.push('/employee')
+  }
+
+  else{
+    alert("wrong credentials")
+  }
   };
 
-  return (
+const logout=()=>{
+  setLoged(false)
+}
+
+  if(loged)
+  {
+    return(<div onClick={logout}>logout</div>)
+  }
+  else
+  {
+    return( 
     <div className="flex justify-center items-center h-screen">
-      <div className="bg-gray-100 p-8 rounded shadow-md">
-        <h2 className="text-2xl mb-4 text-center">Login</h2>
-        <div className="mb-4">
-          <label htmlFor="username" className="block mb-1">Username:</label>
-          <input
-            type="text"
-            id="username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            className="w-full border border-gray-300 rounded px-3 py-2"
-          />
-        </div>
-        <div className="mb-4">
-          <label htmlFor="password" className="block mb-1">Password:</label>
-          <input
-            type="password"
-            id="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full border border-gray-300 rounded px-3 py-2"
-          />
-        </div>
-        {error && <div className="text-red-500 mb-4">{error}</div>}
-        <button onClick={handleFarmerLogin} className="w-full bg-blue-500 text-white rounded px-4 py-2 mb-2">Login as Farmer</button>
-        <button onClick={handleEmployeeLogin} className="w-full bg-green-500 text-white rounded px-4 py-2">Login as Employee</button>
+      <Backgroundimg/>
+    <div className="bg-gray-100 p-8 rounded shadow-md">
+      <h2 className="text-2xl mb-4 text-center">Login</h2>
+      <div className="mb-4">
+        <label htmlFor="username" className="block mb-1">LoginId:</label>
+        <input
+          type="number"
+          id="username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          className="w-full border border-gray-300 rounded px-3 py-2"
+        />
       </div>
+      <div className="mb-4">
+        <label htmlFor="password" className="block mb-1">Password:</label>
+        <input
+          type="password"
+          id="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className="w-full border border-gray-300 rounded px-3 py-2"
+        />
+      </div>
+      {error && <div className="text-red-500 mb-4">{error}</div>}
+      <button onClick={handleFarmerLogin} className="w-full bg-green-500 text-white rounded px-4 py-2 mb-2">Login as Farmer</button>
+      <button onClick={handleEmployeeLogin} className="w-full bg-blue-500 text-white rounded px-4 py-2">Login as Employee</button>
     </div>
-  );
+  </div>)
+  }
 };
 
 export default Login;

@@ -1,8 +1,11 @@
 "use client"
 import React, { useState, useEffect } from 'react';
+import { graphqlClient } from '../../../clients/api';
+import { getFarmer } from '../../../graphql/query/user';
+import Backgroundimg from '../components/Backgroundimg';
 // You can use axios or any other HTTP client for API requests
 
-const Dashboard = () => {
+const Dashboard = async () => {
   const [cows, setCows] = useState([]);
   const [rawMaterials, setRawMaterials] = useState([]);
   const [milkData, setMilkData] = useState([]);
@@ -26,9 +29,16 @@ const Dashboard = () => {
 
   //   fetchData();
   // }, []);
-
+  
+  const pd={
+    id:1
+  }
+   const data= await graphqlClient.request(getFarmer,{token:pd})
+   
+  console.log(data.getFarmer?.cow)
   return (
     <div className="container mx-auto">
+      <Backgroundimg/>
       <h1 className="text-3xl font-bold my-8 text-center">Farm Dashboard</h1>
 
       {/* Render cow information */}
@@ -67,7 +77,7 @@ const Dashboard = () => {
         </ul>
       </div>
     </div>
-  );
+  ); 
 };
-
+  
 export default Dashboard;

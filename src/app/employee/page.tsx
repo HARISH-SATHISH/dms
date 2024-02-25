@@ -1,5 +1,9 @@
 "use client"
 import React, { useState, useEffect } from 'react';
+import { graphqlClient } from '../../../clients/api';
+import { addMilkData, addRawData } from '../../../graphql/mutation';
+import { getFarmer } from '../../../graphql/query/user';
+import Backgroundimg from '../components/Backgroundimg';
 
 // import axios from 'axios'; // You can use axios or any other HTTP client for API requests
 
@@ -47,15 +51,15 @@ const [milkDataForm, setMilkDataForm] = useState({
     });
 
     // Calculate amount when price is entered
-    if (name === 'price') {
-      const quantity = milkDataForm.quantity;
-      const price = value;
-      const amount = parseFloat(quantity) * parseFloat(price);
-      setMilkDataForm({
-        ...milkDataForm,
-        amt: isNaN(amount) ? '' : amount.toFixed(2)
-      });
-    }
+    // if (name === 'price') {
+    //   const quantity = milkDataForm.quantity;
+    //   const price = value;
+    //   const amount = parseFloat(quantity) * parseFloat(price);
+    //   setMilkDataForm({
+    //     ...milkDataForm,
+    //     amt: isNaN(amount) ? '' : amount.toFixed(2)
+    //   });
+    // }
   };
 
   const handleMilkFormSubmit = async (e:any) => {
@@ -63,8 +67,16 @@ const [milkDataForm, setMilkDataForm] = useState({
     try {
       // Send POST request to your backend API to add milk data
       
-
+      const payload= {
+        amt: parseInt(milkDataForm.price)*parseInt(milkDataForm.quantity),
+        date: milkDataForm.date,
+        farmerId: parseInt(milkDataForm.farmerId),
+        price: parseInt(milkDataForm.price),
+        quantity: parseInt(milkDataForm.quantity)
+      }
+        graphqlClient.request(addMilkData,{payload:payload})
       // Reset form fields after successful submission
+      alert("milk data added")
       setMilkDataForm({
         farmerId: '',
         quantity: '',
@@ -85,8 +97,9 @@ const [rawMaterialForm, setRawMaterialForm] = useState({
     drug: '',
     cowId: ''
   });
-  const [cowOptions, setCowOptions] = useState([]);
-  
+ 
+  const [cows, setCows] = useState<(number | null | undefined)[]>([]);
+
   useEffect(() => {
     if (rawMaterialForm.farmerId !== '') {
       fetchCowsByFarmerId(rawMaterialForm.farmerId);
@@ -94,12 +107,19 @@ const [rawMaterialForm, setRawMaterialForm] = useState({
   }, [rawMaterialForm.farmerId]);
 
   const fetchCowsByFarmerId = async (farmerId: string) => {
-    try {
-    //   const response = await axios.get(`/api/farmers/${farmerId}/cows`); // Adjust the endpoint as per your API
-    //   setCowOptions(response.data);
-    } catch (error) {
-      console.error('Error fetching cows by farmer ID:', error);
+    const pd={
+      id:parseInt(farmerId)
     }
+    const data=await graphqlClient.request(getFarmer,{token:pd})
+    if(data.getFarmer?.cow){
+      const cows=data.getFarmer.cow
+      const ids= cows.map((cow)=>{return(cow?.id)})
+     if(ids)
+     {
+         setCows(ids)
+     }
+    } 
+    
   };
 
   const handleRawMaterialFormChange = (e: { target: { name: any; value: any; }; }) => {
@@ -115,8 +135,16 @@ const [rawMaterialForm, setRawMaterialForm] = useState({
     try {
       // Send POST request to your backend API to add raw material data
      
+      const rawdata={
+        cowId: parseInt(rawMaterialForm.cowId),
+        drug: rawMaterialForm.drug,
+        farmerId: parseInt(rawMaterialForm.farmerId),
+        feed: rawMaterialForm.feed
+      }
 
+      await graphqlClient.request(addRawData,{payload:rawdata})
       // Reset form fields after successful submission
+      alert("data submitted")
       setRawMaterialForm({
         farmerId: '',
         feed: '',
@@ -142,6 +170,7 @@ const toggleMilkForm = () => {
 
   return (
     <div className="container mx-auto">
+      <Backgroundimg/>
       <h1 className="text-3xl font-bold my-8 text-center">Employee Dashboard</h1>
 
       <div className="flex justify-center mb-8">
@@ -207,11 +236,12 @@ const toggleMilkForm = () => {
            value={milkDataForm.price}
            onChange={handleMilkFormChange}
            className="border rounded-md px-3 py-2 w-full"
-           required
+          
          >
            <option value="">Select Price</option>
            <option value="35">35</option>
-           <option value="33">33</option>
+           <option value="32">32</option>
+           <option value="29">29</option>
          </select>
        </div>
        <div className="mb-4">
@@ -220,7 +250,7 @@ const toggleMilkForm = () => {
            type="text"
            id="amt"
            name="amt"
-           value={milkDataForm.amt}
+           value={parseFloat(milkDataForm.quantity)*parseFloat(milkDataForm.price)}
            onChange={handleMilkFormChange}
            className="border rounded-md px-3 py-2 w-full"
            readOnly // Making the amount field read-only
@@ -281,9 +311,9 @@ const toggleMilkForm = () => {
             required
           >
             <option value="">Select Cow</option>
-            {/* {cowOptions.map(cow => (
-              <option key={cow.id} value={cow.id}>{cow.name}</option>
-            ))} */}
+          {
+            cows?.map((cow)=>{return(<option key={cow}>{cow}</option>)})
+          }
           </select>
         </div>
         <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-md">Submit</button>

@@ -5,8 +5,8 @@ const Price = () => {
     <section className="text-gray-600 body-font">
   <div className="container px-5 py-24 mx-auto">
     <div className="flex flex-col text-center w-full mb-20">
-      <h1 className="sm:text-4xl text-3xl font-medium title-font mb-2 text-gray-900">Pricing</h1>
-      <p className="lg:w-2/3 mx-auto leading-relaxed text-base">pricing is subjected to market</p>
+      <h1 className="sm:text-4xl text-3xl font-medium title-font mb-2 text-gray-900">Pricing <span className=' text-green-500'>per</span> Liter</h1>
+      <p className="lg:w-2/3 mx-auto leading-relaxed text-base">Pricing is subjected to market</p>
     </div>
     <div className="lg:w-2/3 w-full mx-auto overflow-auto">
       <table className="table-auto w-full text-left whitespace-no-wrap">
@@ -18,13 +18,19 @@ const Price = () => {
         </thead>
         <tbody>
           <tr>
-            <td className="px-4 py-3">C-9</td>
-            <td className="px-4 py-3">34</td>
+            <td className="px-4 py-3">Cal-90%</td>
+            <td className="px-4 py-3">35</td>
             
           </tr>
            <tr>
-            <td className="border-t-2 border-gray-200 px-4 py-3">c-8</td>
+            <td className="border-t-2 border-gray-200 px-4 py-3">Cal-85%</td>
             <td className="border-t-2 border-gray-200 px-4 py-3">32</td>
+        
+            
+          </tr>
+          <tr>
+            <td className="border-t-2 border-gray-200 px-4 py-3">Cal-80%</td>
+            <td className="border-t-2 border-gray-200 px-4 py-3">29</td>
         
             
           </tr>

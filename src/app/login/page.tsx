@@ -4,13 +4,14 @@ import { useRouter } from 'next/navigation'
 import { graphqlClient } from '../../../clients/api';
 import { verifyEmp, verifyFarmer } from '../../../graphql/query/user';
 import Backgroundimg from '../components/Backgroundimg';
+import { useGlobalContext } from '../context/store';
 
 const Login: React.FC = () => {
   const router = useRouter()
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [loged,setLoged]=useState(false)
+  const {userId,setUserId}=useGlobalContext()
 
 const creddata={
   id:parseInt(username),
@@ -21,7 +22,7 @@ const creddata={
   const farmer=await graphqlClient.request(verifyFarmer,{payload:creddata})
   
   if(farmer.verifyFarmer?.id){
-    setLoged(true)
+    setUserId(`${farmer.verifyFarmer.id}`)
   
     router.push('/farmer')
   }
@@ -38,7 +39,7 @@ const creddata={
     const farmer=await graphqlClient.request(verifyEmp,{payload:creddata})
   
   if(farmer.verifyEmp?.id){
-    setLoged(true)
+  
   
     router.push('/employee')
   }
@@ -48,16 +49,7 @@ const creddata={
   }
   };
 
-const logout=()=>{
-  setLoged(false)
-}
 
-  if(loged)
-  {
-    return(<div onClick={logout}>logout</div>)
-  }
-  else
-  {
     return( 
     <div className="flex justify-center items-center h-screen">
       <Backgroundimg/>
@@ -88,7 +80,7 @@ const logout=()=>{
       <button onClick={handleEmployeeLogin} className="w-full bg-blue-500 text-white rounded px-4 py-2">Login as Employee</button>
     </div>
   </div>)
-  }
+  
 };
 
 export default Login;
